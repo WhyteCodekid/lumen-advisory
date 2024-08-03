@@ -1,6 +1,6 @@
 import { NextUIProvider } from "@nextui-org/react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type { LinksFunction } from "@remix-run/node";
+import type { LinksFunction, LoaderFunction } from "@remix-run/node";
 import {
   Links,
   LiveReload,
@@ -8,33 +8,49 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  useLoaderData,
 } from "@remix-run/react";
-// import { useState, useEffect } from "react";
-// import { io, Socket } from "socket.io-client";
+import { Toaster, toast } from "sonner";
+import { useState, useEffect } from "react";
+import { io, Socket } from "socket.io-client";
+import { getFlashSession } from "~/flash-session";
 
-// import { SocketProvider } from "~/context";
+import { SocketProvider } from "~/context";
 
 import styles from "~/tailwind.css";
+// import { errorToast, successToast } from "./components/ui/toasters";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export default function App() {
-  // const [socket, setSocket] = useState<Socket>();
+  const loaderData = useLoaderData<typeof loader>();
+  const [socket, setSocket] = useState<Socket>();
 
-  // useEffect(() => {
-  //   const socket = io("http://192.168.43.127:5173");
-  //   setSocket(socket);
-  //   return () => {
-  //     socket.close();
-  //   };
-  // }, []);
+  useEffect(() => {
+    const socket = io("http://192.168.43.127:5173");
+    setSocket(socket);
+    return () => {
+      socket.close();
+    };
+  }, []);
 
-  // useEffect(() => {
-  //   if (!socket) return;
-  //   socket.on("confirmation", (data) => {
-  //     console.log(data);
-  //   });
-  // }, [socket]);
+  useEffect(() => {
+    if (!socket) return;
+    socket.on("confirmation", (data) => {
+      console.log(data);
+    });
+  }, [socket]);
+
+  // display notification toasts
+  useEffect(() => {
+    if (loaderData) {
+      if (!loaderData?.errors && loaderData?.code === 200) {
+        toast.success(loaderData.message);
+      } else {
+        toast.error(loaderData?.message);
+      }
+    }
+  }, [loaderData]);
 
   return (
     <html lang="en">
@@ -47,9 +63,10 @@ export default function App() {
       <body>
         <NextUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="dark">
-            {/* <SocketProvider socket={socket}> */}
-            <Outlet />
-            {/* </SocketProvider> */}
+            <SocketProvider socket={socket}>
+              <Toaster position="bottom-right" richColors />
+              <Outlet />
+            </SocketProvider>
             <ScrollRestoration />
             <Scripts />
             <LiveReload />
@@ -59,3 +76,15 @@ export default function App() {
     </html>
   );
 }
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const flashSession = await getFlashSession(request.headers.get("Cookie"));
+
+  const alert = flashSession.get("alert");
+
+  if (alert) {
+    return alert;
+  } else {
+    return null;
+  }
+};
