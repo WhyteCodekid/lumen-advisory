@@ -70,17 +70,21 @@ export default function ConsoleLogin() {
 export const action: ActionFunction = async ({ request }) => {
   // extract form data values
   const formData = await request.formData();
-  const formValues = Object.fromEntries(formData.entries());
+  const email = formData.get("email");
+  const password = formData.get("password");
 
   // make post request
   try {
     const response = await axios.post(
-      `${process.env.BACKEND_API_BASE_URL}/login`,
-      formValues
+      `${process.env.BACKEND_API_BASE_URL}/admins/login`,
+      {
+        email,
+        password,
+      }
     );
-    console.log(response);
+    console.log(response.data);
 
-    return response;
+    return response.data;
   } catch (error) {
     console.error(error);
     return {};
