@@ -1,6 +1,8 @@
 import { Button, Card, Input } from "@nextui-org/react";
-import { ActionFunction } from "@remix-run/node";
-import { Form, useNavigation } from "@remix-run/react";
+import { ActionFunction, LoaderFunction } from "@remix-run/node";
+import { Form, useNavigation, redirect } from "@remix-run/react";
+import { getFlashSession } from "~/flash-session";
+import { getSession, commitSession } from "~/session";
 import axios from "axios";
 
 export default function ConsoleLogin() {
@@ -68,6 +70,12 @@ export default function ConsoleLogin() {
 }
 
 export const action: ActionFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const redirectTo = url.searchParams.get("redirectTo");
+
+  // flash session
+  const flashSession = await getFlashSession(request.headers.get("Cookie"));
+  const authSession = await getSession(request.headers.get("Cookie"));
   // extract form data values
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
@@ -78,12 +86,37 @@ export const action: ActionFunction = async ({ request }) => {
       `${process.env.BACKEND_API_BASE_URL}/admins/login`,
       formValues
     );
-    console.log(response.data);
 
-    return response.data;
+    // set token to cookie storage
+    if (response.data.code === 200) {
+      authSession.set("token", response.data.data.token);
+    }
+
+    flashSession.set("alert", response.data);
+
+    return response;
   } catch (error) {
     console.error(error);
-    return {};
-    // throw new Error("Failed to login", { cause: error });
+    throw new Error("Failed to login", { cause: error });
   }
+};
+
+export const loader: LoaderFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const redirectTo = url.searchParams.get("redirectTo");
+
+  const authSession = await getSession(request.headers.get("Cookie"));
+
+  const token = authSession.get("token");
+  console.log(token || "no token");
+
+  if (token) {
+    return redirect(redirectTo || "/console", {
+      headers: {
+        "Set-Cookie": await commitSession(authSession),
+      },
+    });
+  }
+
+  return null;
 };
