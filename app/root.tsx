@@ -1,4 +1,5 @@
-import { cssBundleHref } from "@remix-run/css-bundle";
+import { NextUIProvider } from "@nextui-org/react";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import type { LinksFunction } from "@remix-run/node";
 import {
   Links,
@@ -8,12 +9,33 @@ import {
   Scripts,
   ScrollRestoration,
 } from "@remix-run/react";
+// import { useState, useEffect } from "react";
+// import { io, Socket } from "socket.io-client";
 
-export const links: LinksFunction = () => [
-  ...(cssBundleHref ? [{ rel: "stylesheet", href: cssBundleHref }] : []),
-];
+// import { SocketProvider } from "~/context";
+
+import styles from "~/tailwind.css";
+
+export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
 
 export default function App() {
+  // const [socket, setSocket] = useState<Socket>();
+
+  // useEffect(() => {
+  //   const socket = io("http://192.168.43.127:5173");
+  //   setSocket(socket);
+  //   return () => {
+  //     socket.close();
+  //   };
+  // }, []);
+
+  // useEffect(() => {
+  //   if (!socket) return;
+  //   socket.on("confirmation", (data) => {
+  //     console.log(data);
+  //   });
+  // }, [socket]);
+
   return (
     <html lang="en">
       <head>
@@ -23,10 +45,16 @@ export default function App() {
         <Links />
       </head>
       <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        <LiveReload />
+        <NextUIProvider>
+          <NextThemesProvider attribute="class" defaultTheme="dark">
+            {/* <SocketProvider socket={socket}> */}
+            <Outlet />
+            {/* </SocketProvider> */}
+            <ScrollRestoration />
+            <Scripts />
+            <LiveReload />
+          </NextThemesProvider>
+        </NextUIProvider>
       </body>
     </html>
   );
