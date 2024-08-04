@@ -27,7 +27,7 @@ export default function App() {
   const [socket, setSocket] = useState<Socket>();
 
   useEffect(() => {
-    const socket = io("http://192.168.43.127:5173");
+    const socket = io("https://lumen.printmoney.money");
     setSocket(socket);
     return () => {
       socket.close();

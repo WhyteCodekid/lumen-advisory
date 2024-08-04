@@ -10,7 +10,7 @@ export default function Sidebar() {
 
   return (
     <aside
-      className={`h-screen bg-slate-900 ${
+      className={`h-screen dark:bg-slate-900/10 border-r dark:border-white/5 ${
         open ? "w-[17%]" : "w-20"
       } relative transition-all duration-400 flex flex-col justify-between`}
     >

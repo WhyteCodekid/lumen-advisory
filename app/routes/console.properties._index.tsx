@@ -10,7 +10,8 @@ export default function PropertiesIndex() {
           New Property
         </Button>
       </div>
-      <h1>Properties Index</h1>
+      <div className="h-screen"></div>
+      <div className="h-screen"></div>
     </div>
   );
 }
