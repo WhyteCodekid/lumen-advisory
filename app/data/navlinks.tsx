@@ -20,3 +20,10 @@ export const adminNavLinks = [
     icon: <DashboardBox />,
   },
 ];
+
+export const publicNavLinks = [
+  { label: "Home", path: "/" },
+  { label: "About Us", path: "/about-us" },
+  { label: "Properties", path: "/properties" },
+  { label: "Contact Us", path: "/contact" },
+];

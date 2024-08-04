@@ -1,5 +1,5 @@
 import { Checkbox } from "@nextui-org/react";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function CustomCheckbox({
   name,

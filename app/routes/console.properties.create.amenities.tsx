@@ -53,7 +53,7 @@ export default function CreatePropertyOverview() {
     <div>
       <Form
         method="POST"
-        id="property-amenities-form"
+        id="property-media-form"
         className="grid grid-cols-1 gap-5"
       >
         {/* property details */}
@@ -117,7 +117,7 @@ export default function CreatePropertyOverview() {
 
           <Button
             type="submit"
-            form="property-amenities-form"
+            form="property-media-form"
             color="primary"
             className="w-max"
             isLoading={navigation.state === "submitting"}
