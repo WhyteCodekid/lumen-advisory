@@ -6,12 +6,7 @@ import {
   LoaderFunction,
   redirect,
 } from "@remix-run/node";
-import {
-  Form,
-  useLoaderData,
-  useNavigate,
-  useNavigation,
-} from "@remix-run/react";
+import { Form, useNavigate, useNavigation } from "@remix-run/react";
 import axios from "axios";
 import { ReactNode } from "react";
 import CustomCheckbox from "~/components/inputs/checkbox";
@@ -45,7 +40,7 @@ const FormSection = ({
 };
 
 export default function CreatePropertyOverview() {
-  const { propertyId } = useLoaderData<typeof loader>();
+  // const { token, baseAPI } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
 
@@ -58,12 +53,6 @@ export default function CreatePropertyOverview() {
       >
         {/* property details */}
         <FormSection title="Property Details">
-          <TextInput
-            label="Property Id"
-            name="propertyId"
-            className="hidden"
-            value={propertyId}
-          />
           <TextInput label="Size" name="size" type="number" />
           <TextInput label="Floor" name="floor" type="number" />
           <TextInput
@@ -78,30 +67,7 @@ export default function CreatePropertyOverview() {
             name="constructionYear"
             type="number"
           />
-          <TextInput label="Renovation Year" name="renovation" type="number" />
-        </FormSection>
-
-        {/* indoor features */}
-        <FormSection title="Indoor Features">
-          <CustomCheckbox name="airCondition">Air Conditioning</CustomCheckbox>
-          <CustomCheckbox name="fireplace">Fireplace</CustomCheckbox>
-          <CustomCheckbox name="ventilation">Ventilation</CustomCheckbox>
-          <CustomCheckbox name="elevator">Elevator</CustomCheckbox>
-          <CustomCheckbox name="cableTV">Cable TV</CustomCheckbox>
-          <CustomCheckbox name="wifi">WiFi</CustomCheckbox>
-          <TextInput label="Furnishing" name="furnishing" />
-        </FormSection>
-
-        {/* outdoor features */}
-        <FormSection title="Outdoor Features">
-          <CustomCheckbox name="garage">Garage</CustomCheckbox>
-          <CustomCheckbox name="petFriendly">Pet Friendly</CustomCheckbox>
-          <CustomCheckbox name="swimmingPool">Swimming Pool</CustomCheckbox>
-          <CustomCheckbox name="barbequeGrill">Barbeque Grill</CustomCheckbox>
-          <TextInput label="Disabled Access" name="disabledAccess" />
-          <TextInput label="Fence" name="fence" />
-          <TextInput label="Garden (m2)" name="garden" type="number" />
-          <TextInput label="Security" name="security" />
+          <TextInput label="Renovation" name="renovation" />
         </FormSection>
 
         {/* submit button */}
@@ -110,7 +76,7 @@ export default function CreatePropertyOverview() {
             type="button"
             className="w-max"
             variant="flat"
-            onClick={() => navigate("/console/properties/create")}
+            onPress={() => navigate("/console/properties/create/amenities")}
           >
             Go Back
           </Button>
@@ -168,14 +134,12 @@ export const action: ActionFunction = async ({ request }) => {
       security: formValues.security,
       barbequeGrill: formValues.barbequeGrill,
     },
-    intent: "storeAmenities",
-    id: formValues.propertyId,
   });
 
   try {
     const response = await axios.post(
       `${process.env.BACKEND_API_BASE_URL}/admins/properties`,
-      stringiFiedFormValues,
+      { ...formValues, intent: "storeAmenities" },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -183,25 +147,16 @@ export const action: ActionFunction = async ({ request }) => {
       }
     );
     flashSession.set("alert", response.data);
-
-    if (response.data.status === "success") {
-      return redirect("/console/properties/create/media", {
-        headers: {
-          "Set-Cookie": await commitFlashSession(flashSession),
-        },
-      });
-    } else {
-      return json(response.data, {
-        headers: {
-          "Set-Cookie": await commitFlashSession(flashSession),
-        },
-      });
-    }
-  } catch (error: any) {
+    return redirect("/console/properties/create/amenities", {
+      headers: {
+        "Set-Cookie": await commitFlashSession(flashSession),
+      },
+    });
+  } catch (error) {
     flashSession.set("alert", {
       code: 401,
       status: "error",
-      message: "Failed to create property!" + error.message,
+      message: "Failed to create property",
     });
     console.log(error);
     return json(null, {
