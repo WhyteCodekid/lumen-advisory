@@ -13,6 +13,11 @@ export default {
         sen: ["Sen", "sans-serif"],
         quicksand: ["Quicksand", "sans-serif"],
         nunito: ["Nunito", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
+      },
+      backgroundImage: {
+        banner:
+          "linear-gradient(to bottom, rgba(2,6,23,0.5), rgba(2,6,23,0.55)), url('https://lumen-advisory.com/wp-content/uploads/2024/07/WhatsApp-Image-2024-07-11-at-17.37.32.jpeg')",
       },
     },
   },

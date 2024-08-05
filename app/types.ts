@@ -16,6 +16,7 @@ export type PropertyInterface = {
   bedrooms?: number;
   bathrooms?: number;
   squareFeet?: number;
+  location?: string;
 
   images?: string[];
   videos?: string[];

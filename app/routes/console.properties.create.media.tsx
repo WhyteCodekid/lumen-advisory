@@ -6,14 +6,22 @@ import {
   LoaderFunction,
   redirect,
 } from "@remix-run/node";
-import { Form, useNavigate, useNavigation } from "@remix-run/react";
+import {
+  Form,
+  useLoaderData,
+  useNavigate,
+  useNavigation,
+} from "@remix-run/react";
 import axios from "axios";
-import { ReactNode } from "react";
-import CustomCheckbox from "~/components/inputs/checkbox";
+import { ReactNode, useRef, useState } from "react";
+import MultipleFileInput from "~/components/inputs/multi-file";
 import TextInput from "~/components/inputs/text-input";
 import { commitFlashSession, getFlashSession } from "~/flash-session";
 import { getPropertyIdSession } from "~/property-id-session";
 import { getSession } from "~/session";
+import path from "path";
+import fs from "fs";
+import { fileURLToPath } from "url";
 
 export type SelectOption = {
   value: string;
@@ -34,40 +42,56 @@ const FormSection = ({
         <div className="h-[1px] flex-1 bg-slate-300 dark:bg-white/15"></div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">{children}</div>
+      <div className="">{children}</div>
     </div>
   );
 };
 
 export default function CreatePropertyOverview() {
-  // const { token, baseAPI } = useLoaderData<typeof loader>();
+  const { propertyId } = useLoaderData<typeof loader>();
   const navigation = useNavigation();
   const navigate = useNavigate();
+
+  // refs for file inputs
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const videoInputRef = useRef<HTMLInputElement>(null);
+
+  const [imageFiles, setImageFiles] = useState<string[]>([]);
+  const [videoFiles, setVideoFiles] = useState<string[]>([]);
 
   return (
     <div>
       <Form
         method="POST"
         id="property-amenities-form"
-        className="grid grid-cols-1 gap-5"
+        className="grid grid-cols-1 gap-12"
       >
         {/* property details */}
-        <FormSection title="Property Details">
-          <TextInput label="Size" name="size" type="number" />
-          <TextInput label="Floor" name="floor" type="number" />
-          <TextInput
-            label="Additional Space"
-            name="additionalSpace"
-            type="number"
+        <TextInput
+          label="Property Id"
+          name="propertyId"
+          className="hidden"
+          value={propertyId}
+        />
+        <FormSection title="Property Images">
+          <MultipleFileInput
+            name="images"
+            fileType="image"
+            label="Click to upload images"
+            inputRef={imageInputRef}
+            base64Strings={imageFiles}
+            setBase64Strings={setImageFiles}
           />
-          <TextInput label="Furnishing" name="furnishing" />
-          <TextInput label="Ceiling Heigh" name="ceilingHeight" type="number" />
-          <TextInput
-            label="Construction Year"
-            name="constructionYear"
-            type="number"
+        </FormSection>
+        <FormSection title="Property Videos">
+          <MultipleFileInput
+            name="videos"
+            fileType="video"
+            label="Click to upload video"
+            inputRef={videoInputRef}
+            base64Strings={videoFiles}
+            setBase64Strings={setVideoFiles}
           />
-          <TextInput label="Renovation" name="renovation" />
         </FormSection>
 
         {/* submit button */}
@@ -105,41 +129,52 @@ export const action: ActionFunction = async ({ request }) => {
   // form data
   const formData = await request.formData();
   const formValues = Object.fromEntries(formData.entries());
-  const stringiFiedFormValues = JSON.stringify({
-    details: {
-      size: formValues.size,
-      floor: formValues.floor,
-      additionalSpace: formValues.additionalSpace,
-      furnishing: formValues.furnishing,
-      ceilingHeight: formValues.ceilingHeight,
-      constructionYear: formValues.constructionYear,
-      renovation: formValues.renovation,
-    },
-    indoorFeatures: {
-      airCondition: formValues.airCondition,
-      fireplace: formValues.fireplace,
-      elevator: formValues.elevator,
-      ventilation: formValues.ventilation,
-      windowType: formValues.windowType,
-      cableTV: formValues.cableTV,
-      wifi: formValues.wifi,
-    },
-    outdoorFeatures: {
-      garage: formValues.garage,
-      disabledAccess: formValues.disabledAccess,
-      fence: formValues.fence,
-      petFriendly: formValues.petFriendly,
-      garden: formValues.garden,
-      swimmingPool: formValues.swimmingPool,
-      security: formValues.security,
-      barbequeGrill: formValues.barbequeGrill,
-    },
-  });
+
+  const images = JSON.parse(formValues.images);
+  const videos = JSON.parse(formValues.videos);
+
+  // Get the directory name of the current module
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+
+  // Define the output directory and file
+  const publicDir = path.join(__dirname, "../public");
+  const outputPath = path.join(publicDir, "uploaded_files", "images");
+  const outputVideoPath = path.join(publicDir, "uploaded_files", "videos");
+
+  let imageNames = [];
+  let videoNames = [];
+
+  try {
+    const uploadImagePromises = images.map((image) =>
+      base64ToFile(image, outputPath)
+    );
+
+    const uploadVideoPromises = videos.map((video) =>
+      base64ToFile(video, outputVideoPath)
+    );
+
+    const uploadedImagesFiles = await Promise.all(uploadImagePromises);
+    const uploadedVideosFiles = await Promise.all(uploadVideoPromises);
+    console.log({ uploadedImagesFiles, uploadedVideosFiles });
+
+    imageNames = uploadedImagesFiles;
+    videoNames = uploadedVideosFiles;
+  } catch (error) {
+    console.error("Error uploading files:", error);
+  }
+
+  // return true;
 
   try {
     const response = await axios.post(
       `${process.env.BACKEND_API_BASE_URL}/admins/properties`,
-      { ...formValues, intent: "storeAmenities" },
+      {
+        images: imageNames,
+        videos: videoNames,
+        intent: "storeMedia",
+        id: formValues.propertyId,
+      },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -147,7 +182,7 @@ export const action: ActionFunction = async ({ request }) => {
       }
     );
     flashSession.set("alert", response.data);
-    return redirect("/console/properties/create/amenities", {
+    return redirect("/console/properties/create/media", {
       headers: {
         "Set-Cookie": await commitFlashSession(flashSession),
       },
@@ -165,6 +200,48 @@ export const action: ActionFunction = async ({ request }) => {
       },
     });
   }
+};
+
+// Function to convert base64 string to a file and save it
+const base64ToFile = (base64String, outputDir) => {
+  return new Promise((resolve, reject) => {
+    // Extract the MIME type from the base64 string
+    const matches = base64String.match(/^data:(.+);base64,/);
+    if (!matches) {
+      return reject(new Error("Invalid base64 string"));
+    }
+
+    // Get MIME type and determine the extension
+    const mimeType = matches[1];
+    const extension = mimeType.split("/")[1];
+    if (!extension) {
+      return reject(new Error("Could not determine file extension"));
+    }
+
+    // Generate a unique filename with timestamp
+    const filename = `file_${Date.now()}.${extension}`;
+    const outputPath = path.join(outputDir, filename);
+
+    // Extract the data part from the base64 string
+    const base64Data = base64String.split(";base64,").pop();
+
+    // Decode the base64 string
+    const buffer = Buffer.from(base64Data, "base64");
+
+    // Ensure the directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // Write the buffer to a file
+    fs.writeFile(outputPath, buffer, (err) => {
+      if (err) {
+        return reject(err);
+      } else {
+        resolve(filename);
+      }
+    });
+  });
 };
 
 export const loader: LoaderFunction = async ({ request }) => {
