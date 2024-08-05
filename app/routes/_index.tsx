@@ -7,7 +7,8 @@ import useSWR from "swr";
 import CustomSelect from "~/components/inputs/select";
 import TextInput from "~/components/inputs/text-input";
 import PublicLayout from "~/components/layouts/public";
-import { CategoryInterface } from "~/types";
+import PropertyCard from "~/components/ui/property-card";
+import { CategoryInterface, PropertyInterface } from "~/types";
 
 export const meta: MetaFunction = () => {
   return [
@@ -37,16 +38,16 @@ export default function Index() {
     fetcher
   );
 
-  const packagesData = useSWR(
+  const propertiesData = useSWR(
     `${baseAPI}/properties?page=${1}&search_term=`,
     fetcher
   );
 
-  if (packagesData?.data?.length > 0) console.log(packagesData.data);
+  if (propertiesData?.data?.length > 0) console.log(propertiesData.data);
 
   return (
     <PublicLayout>
-      <div className="flex justify-center items-center flex-col w-full">
+      <div className="w-full">
         <div className="bg-banner bg-cover bg-no-repeat bg-center h-[60vh] xl:h-[70vh] rounded-[2rem] w-full flex flex-col items-center justify-center gap-6">
           <h1 className="font-montserrat font-bold text-7xl xl:text-8xl text-white text-center">
             Easy way to find the perfect property
@@ -85,6 +86,20 @@ export default function Index() {
                 Search Properties
               </Button>
             </div>
+          </div>
+        </div>
+
+        {/* property listing */}
+        <div className="flex flex-col gap-4 lg:py-20">
+          <h2 className="font-montserrat font-bold text-3xl">
+            Tailored Properties Just for You
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-5">
+            {propertiesData?.data?.properties?.map(
+              (property: PropertyInterface) => (
+                <PropertyCard property={property} key={property._id} />
+              )
+            )}
           </div>
         </div>
         <h1 className="font-bold text-3xl text-blue-600">Welcome to Remix</h1>

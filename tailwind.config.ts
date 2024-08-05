@@ -13,6 +13,7 @@ export default {
         sen: ["Sen", "sans-serif"],
         quicksand: ["Quicksand", "sans-serif"],
         nunito: ["Nunito", "sans-serif"],
+        poppins: ["Poppins", "sans-serif"],
       },
       backgroundImage: {
         banner:
