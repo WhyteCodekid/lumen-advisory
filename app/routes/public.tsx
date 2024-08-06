@@ -1,24 +1,27 @@
 import { publicNavLinks } from "~/data/navlinks";
-import FrostedNavbar from "../ui/frosted-topnav";
-import { NavLink, useNavigation } from "@remix-run/react";
+import FrostedNavbar from "~/components/ui/frosted-topnav";
+import {
+  NavLink,
+  Outlet,
+  useLoaderData,
+  useNavigation,
+} from "@remix-run/react";
 import {
   FacebookAnimated,
   InstagramAnimated,
   TwitterAnimated,
   YoutubeAnimated,
-} from "../icons/social-media";
-import TextInput from "../inputs/text-input";
+} from "~/components/icons/social-media";
+import TextInput from "~/components/inputs/text-input";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
-import Preloader from "../ui/preloader";
+import Preloader from "~/components/ui/preloader";
+import { LoaderFunction } from "@remix-run/node";
+import { getSession } from "~/session";
 
-export default function PublicLayout({
-  children,
-  token,
-}: {
-  children: React.ReactNode;
-  token?: string;
-}) {
+export default function PublicLayout() {
+  // retrieve token from loader
+  const { token } = useLoaderData<typeof loader>();
   const [scrolled, setScrolled] = useState(false);
   const navigation = useNavigation();
 
@@ -43,7 +46,7 @@ export default function PublicLayout({
           scrolled ? "" : "pt-20"
         } max-w-6xl xl:max-w-[100rem] mx-auto`}
       >
-        {children}
+        <Outlet />
       </section>
 
       <footer className="">
@@ -116,3 +119,13 @@ export default function PublicLayout({
     </main>
   );
 }
+
+export const loader: LoaderFunction = async ({ request }) => {
+  // sessions
+  const authSession = await getSession(request.headers.get("Cookie"));
+  const token = authSession.get("token");
+
+  return {
+    token,
+  };
+};

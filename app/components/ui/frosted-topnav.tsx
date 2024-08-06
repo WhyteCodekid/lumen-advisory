@@ -4,6 +4,7 @@ import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
+  DropdownSection,
   DropdownTrigger,
 } from "@nextui-org/react";
 import { NavLink } from "@remix-run/react";
@@ -11,7 +12,7 @@ import { useEffect, useRef, useState } from "react";
 import { publicNavLinks } from "~/data/navlinks";
 import ThemeSwitcher from "./theme-switcher";
 
-export default function FrostedNavbar() {
+export default function FrostedNavbar({ token }: { token?: string }) {
   const [scrolled, setScrolled] = useState(false);
   const [navIsOpen, setNavIsOpen] = useState(false);
 
@@ -109,14 +110,27 @@ export default function FrostedNavbar() {
                   />
                 </DropdownTrigger>
                 <DropdownMenu aria-label="Profile Actions" variant="flat">
-                  <DropdownItem key="profile" className="h-14 gap-2">
-                    <p className="font-semibold">Signed in as</p>
-                    <p className="font-semibold">zoey@example.com</p>
-                  </DropdownItem>
-                  <DropdownItem key="settings">My Settings</DropdownItem>
-                  <DropdownItem key="team_settings">Team Settings</DropdownItem>
-                  <DropdownItem key="analytics">Analytics</DropdownItem>
-                  <DropdownItem key="configurations">Log Out</DropdownItem>
+                  {!token ? (
+                    <DropdownSection>
+                      <DropdownItem key="login">Sign In</DropdownItem>
+                      <DropdownItem key="register">
+                        Create an Account
+                      </DropdownItem>
+                    </DropdownSection>
+                  ) : (
+                    <DropdownSection>
+                      <DropdownItem key="profile" className="h-14 gap-2">
+                        <p className="font-semibold">Signed in as</p>
+                        <p className="font-semibold">zoey@example.com</p>
+                      </DropdownItem>
+                      <DropdownItem key="settings">My Settings</DropdownItem>
+                      <DropdownItem key="team_settings">
+                        Team Settings
+                      </DropdownItem>
+                      <DropdownItem key="analytics">Analytics</DropdownItem>
+                      <DropdownItem key="configurations">Log Out</DropdownItem>
+                    </DropdownSection>
+                  )}
                 </DropdownMenu>
               </Dropdown>
             </div>
