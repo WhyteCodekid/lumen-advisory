@@ -9,7 +9,7 @@ export type PropertyInterface = {
   title: string;
   description?: string;
   price: number;
-  category: string | CategoryInterface;
+  category: CategoryInterface;
   status: "available" | "sold" | "rented";
   leaseType: "rent" | "sale";
   address: string;

@@ -1,6 +1,6 @@
 import { publicNavLinks } from "~/data/navlinks";
 import FrostedNavbar from "../ui/frosted-topnav";
-import { NavLink } from "@remix-run/react";
+import { NavLink, useNavigation } from "@remix-run/react";
 import {
   FacebookAnimated,
   InstagramAnimated,
@@ -10,6 +10,7 @@ import {
 import TextInput from "../inputs/text-input";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
+import Preloader from "../ui/preloader";
 
 export default function PublicLayout({
   children,
@@ -17,6 +18,7 @@ export default function PublicLayout({
   children: React.ReactNode;
 }) {
   const [scrolled, setScrolled] = useState(false);
+  const navigation = useNavigation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -31,7 +33,7 @@ export default function PublicLayout({
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
   return (
-    <main className="dark:bg-slate-950">
+    <main className="dark:bg-slate-950 relative min-h-screen">
       <FrostedNavbar />
 
       <section
@@ -107,6 +109,8 @@ export default function PublicLayout({
           </div>
         </div>
       </footer>
+
+      {navigation.state === "loading" && <Preloader />}
     </main>
   );
 }

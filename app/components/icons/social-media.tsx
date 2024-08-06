@@ -203,3 +203,77 @@ export const InstagramAnimated = (props: React.SVGProps<SVGSVGElement>) => {
     </svg>
   );
 };
+
+export const HeartDuotone = (props: React.SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 256 256"
+      {...props}
+    >
+      <g fill="currentColor">
+        <path
+          d="M232 102c0 66-104 122-104 122S24 168 24 102a54 54 0 0 1 54-54c22.59 0 41.94 12.31 50 32c8.06-19.69 27.41-32 50-32a54 54 0 0 1 54 54"
+          opacity={0.2}
+        ></path>
+        <path d="M178 40c-20.65 0-38.73 8.88-50 23.89C116.73 48.88 98.65 40 78 40a62.07 62.07 0 0 0-62 62c0 70 103.79 126.66 108.21 129a8 8 0 0 0 7.58 0C136.21 228.66 240 172 240 102a62.07 62.07 0 0 0-62-62m-50 174.8c-18.26-10.64-96-59.11-96-112.8a46.06 46.06 0 0 1 46-46c19.45 0 35.78 10.36 42.6 27a8 8 0 0 0 14.8 0c6.82-16.67 23.15-27 42.6-27a46.06 46.06 0 0 1 46 46c0 53.61-77.76 102.15-96 112.8"></path>
+      </g>
+    </svg>
+  );
+};
+
+export const ShareArrowDuotone = (props: React.SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 48 48"
+      {...props}
+    >
+      <defs>
+        <mask id="ipTShareTwo0">
+          <path
+            fill="#555"
+            stroke="#fff"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={4}
+            d="m26 4l18 18l-18 17V28C12 28 6 43 6 43c0-17 5-28 20-28z"
+          ></path>
+        </mask>
+      </defs>
+      <path
+        fill="currentColor"
+        d="M0 0h48v48H0z"
+        mask="url(#ipTShareTwo0)"
+      ></path>
+    </svg>
+  );
+};
+
+export const PrinterDuotone = (props: React.SVGProps<SVGSVGElement>) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="1em"
+      height="1em"
+      viewBox="0 0 24 24"
+      {...props}
+    >
+      <path fill="currentColor" d="M8 5h8v3H8z" opacity={0.3}></path>
+      <circle cx={18} cy={11.5} r={1} fill="currentColor"></circle>
+      <path
+        fill="currentColor"
+        d="M19 8h-1V3H6v5H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3M8 5h8v3H8zm8 14H8v-4h8zm4-4h-2v-2H6v2H4v-4c0-.55.45-1 1-1h14c.55 0 1 .45 1 1z"
+      ></path>
+      <path
+        fill="currentColor"
+        d="M6 13h12v2h2v-4c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v4h2zm12-2.5c.55 0 1 .45 1 1s-.45 1-1 1s-1-.45-1-1s.45-1 1-1"
+        opacity={0.3}
+      ></path>
+    </svg>
+  );
+};

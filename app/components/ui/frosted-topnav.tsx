@@ -42,17 +42,17 @@ export default function FrostedNavbar() {
         <div
           className={`${
             !scrolled ? "max-w-6xl xl:max-w-[100rem] mx-auto" : ""
-          } flex items-center justify-between h-16`}
+          } flex items-center justify-between h-20`}
         >
           <div className="flex items-center">
             <img
               src="https://lumen-advisory.com/wp-content/uploads/2024/07/Asset-19-2048x394.png"
               alt="logo"
-              className="w-40 h-auto dark:bg-white px-2 py-2 rounded-lg"
+              className="w-32 md:w-40 h-auto dark:bg-white px-2 py-2 rounded-lg"
             />
           </div>
 
-          <div className="flex-1 flex items-center justify-center gap-10">
+          <div className="flex-1 md:flex items-center justify-center gap-10 hidden">
             {publicNavLinks.map((item, index) => (
               <NavLink
                 end

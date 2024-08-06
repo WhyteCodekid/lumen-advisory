@@ -46,52 +46,58 @@ export default function Index() {
   if (propertiesData?.data?.length > 0) console.log(propertiesData.data);
 
   return (
-    <PublicLayout>
-      <div className="w-full">
-        <div className="bg-banner bg-cover bg-no-repeat bg-center h-[60vh] xl:h-[70vh] rounded-[2rem] w-full flex flex-col items-center justify-center gap-6">
-          <h1 className="font-montserrat font-bold text-7xl xl:text-8xl text-white text-center">
-            Easy way to find the perfect property
-          </h1>
+    <>
+      {/* {navigation.state !== "loading" ? ( */}
+      <PublicLayout>
+        {/* banner */}
+        <div className="w-full px-4">
+          <div className="bg-banner bg-cover bg-no-repeat bg-center h-[60vh] xl:h-[70vh] rounded-[2rem] w-full flex flex-col items-center justify-center gap-6">
+            <h1 className="font-montserrat font-bold text-3xl md:text-7xl xl:text-8xl text-white text-center">
+              Easy way to find the perfect property
+            </h1>
 
-          {/* property search */}
-          <div className="rounded-2xl bg-white/20 backdrop-blur-md xl:w-4/6 p-4 py-6 flex items-end gap-4">
-            <CustomSelect
-              label="Category"
-              name="category"
-              isLoading={isLoading}
-              color="warning"
-              classNames={{
-                label: "text-white font-montserrat text-lg font-medium",
-              }}
-            >
-              {data?.categories?.map((option: CategoryInterface) => (
-                <SelectItem key={option._id} value={option._id}>
-                  {option.name}
-                </SelectItem>
-              ))}
-            </CustomSelect>
-            <TextInput
-              name="location"
-              label="Location"
-              color="warning"
-              classNames={{
-                label: "text-white font-montserrat text-lg font-medium",
-              }}
-            />
-            <div>
-              <Button
+            {/* property search */}
+            <div className="rounded-2xl bg-white/20 backdrop-blur-md w-[90%] xl:w-4/6 p-4 py-6 flex flex-col md:flex-row md:items-end gap-4">
+              <CustomSelect
+                label="Category"
+                name="category"
+                isLoading={isLoading}
                 color="warning"
-                className="w-max font-montserrat font-semibold"
+                classNames={{
+                  label:
+                    "text-white font-montserrat text-sm md:text-lg font-medium",
+                }}
               >
-                Search Properties
-              </Button>
+                {data?.categories?.map((option: CategoryInterface) => (
+                  <SelectItem key={option._id} value={option._id}>
+                    {option.name}
+                  </SelectItem>
+                ))}
+              </CustomSelect>
+              <TextInput
+                name="location"
+                label="Location"
+                color="warning"
+                classNames={{
+                  label:
+                    "text-white font-montserrat text-sm md:text-lg font-medium",
+                }}
+              />
+              <div>
+                <Button
+                  color="warning"
+                  className="w-max font-montserrat font-semibold"
+                >
+                  Search Properties
+                </Button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* property listing */}
-        <div className="flex flex-col gap-4 lg:py-20">
-          <h2 className="font-montserrat font-bold text-3xl">
+        <div className="flex flex-col gap-6 lg:py-20">
+          <h2 className="font-montserrat font-bold text-3xl lg:text-6xl lg:w-[60%]">
             Tailored Properties Just for You
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4 gap-5">
@@ -128,10 +134,13 @@ export default function Index() {
             </a>
           </li>
         </ul>
-      </div>
 
-      <div className="h-screen"></div>
-    </PublicLayout>
+        <div className="h-screen px-4"></div>
+      </PublicLayout>
+      {/* ) : (
+        <Preloader />
+      )} */}
+    </>
   );
 }
 
