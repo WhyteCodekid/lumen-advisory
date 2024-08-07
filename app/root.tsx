@@ -10,7 +10,8 @@ import {
   ScrollRestoration,
   useLoaderData,
 } from "@remix-run/react";
-import { Toaster, toast } from "sonner";
+// import { Toaster, toast } from "sonner";
+import { Toaster } from "react-hot-toast";
 import { useState, useEffect } from "react";
 import { io, Socket } from "socket.io-client";
 import { getFlashSession } from "~/flash-session";
@@ -18,6 +19,7 @@ import { getFlashSession } from "~/flash-session";
 import { SocketProvider } from "~/context";
 
 import styles from "~/tailwind.css";
+import { errorToast, successToast } from "./components/ui/toasters";
 // import { errorToast, successToast } from "./components/ui/toasters";
 
 export const links: LinksFunction = () => [{ rel: "stylesheet", href: styles }];
@@ -45,9 +47,9 @@ export default function App() {
   useEffect(() => {
     if (loaderData) {
       if (!loaderData?.errors && loaderData?.code === 200) {
-        toast.success(loaderData.message);
+        successToast("Success", loaderData.message);
       } else {
-        toast.error(loaderData?.message);
+        errorToast("Error", loaderData.message);
       }
     }
   }, [loaderData]);
@@ -64,7 +66,7 @@ export default function App() {
         <NextUIProvider>
           <NextThemesProvider attribute="class" defaultTheme="dark">
             <SocketProvider socket={socket}>
-              <Toaster position="bottom-right" richColors />
+              <Toaster position="bottom-right" />
               <Outlet />
             </SocketProvider>
             <ScrollRestoration />

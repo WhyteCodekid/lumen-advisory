@@ -4,12 +4,21 @@ export type CategoryInterface = {
   description: string;
 };
 
+export type UserInterface = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  photo: string;
+};
+
 export type PropertyInterface = {
   _id?: string;
   title: string;
   description?: string;
   price: number;
-  category: string | CategoryInterface;
+  category: CategoryInterface;
   status: "available" | "sold" | "rented";
   leaseType: "rent" | "sale";
   address: string;

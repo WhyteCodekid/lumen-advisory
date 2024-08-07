@@ -14,8 +14,8 @@ export default function PropertyCard({
     <div className="">
       <div className="border-b-2 pb-4 border-slate-300/40 dark:border-white/5">
         <button
-          onClick={() => navigate(`/properties/${property._id}`)}
-          className="rounded-2xl overflow-hidden h-40 md:h-60 !outline-none !ring-0"
+          onClick={() => navigate(`/property/${property._id}`)}
+          className="rounded-2xl overflow-hidden h-40 md:h-60 !outline-none !ring-0 dark:bg-slate-900 w-full"
         >
           <img
             src={`/uploaded_files/images/${
@@ -28,17 +28,19 @@ export default function PropertyCard({
         {/* location */}
         <div className="flex items-center gap-2 mb-2">
           <MapMarkerAnimated />
-          <p className="text-xs uppercase font-nunito">{property.location}</p>
+          <p className="text-xs uppercase font-nunito">
+            {property.location} - {property?.category?.name}
+          </p>
         </div>
         {/* property title */}
         <Link
-          to={`/properties/${property._id}`}
+          to={`/property/${property._id}`}
           className="font-poppins font-medium text-slate-950 dark:text-white text-3xl"
         >
           {property.title}
         </Link>
         {/* description */}
-        <p className="font-nunito text-slate-700 dark:text-slate-200">
+        <p className="font-nunito text-slate-700 dark:text-slate-200 line-clamp-2">
           {property.description}
         </p>
       </div>
