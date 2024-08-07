@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { publicNavLinks } from "~/data/navlinks";
 import FrostedNavbar from "~/components/ui/frosted-topnav";
 import {
@@ -16,12 +17,20 @@ import TextInput from "~/components/inputs/text-input";
 import { Button } from "@nextui-org/react";
 import { useEffect, useState } from "react";
 import Preloader from "~/components/ui/preloader";
-import { LoaderFunction } from "@remix-run/node";
-import { getSession } from "~/session";
+import {
+  ActionFunction,
+  json,
+  LoaderFunction,
+  redirect,
+} from "@remix-run/node";
+import { commitFlashSession, getFlashSession } from "~/flash-session";
+import axios from "axios";
+import { commitUserSession, getUserSession } from "~/user-session";
 
 export default function PublicLayout() {
   // retrieve token from loader
-  const { token } = useLoaderData<typeof loader>();
+  const { token, user } = useLoaderData<typeof loader>();
+
   const [scrolled, setScrolled] = useState(false);
   const navigation = useNavigation();
 
@@ -39,7 +48,7 @@ export default function PublicLayout() {
   }, []);
   return (
     <main className="dark:bg-slate-950 relative min-h-screen">
-      <FrostedNavbar token={token} />
+      <FrostedNavbar token={token} user={user} />
 
       <section
         className={`${
@@ -120,12 +129,76 @@ export default function PublicLayout() {
   );
 }
 
+export const action: ActionFunction = async ({ request }) => {
+  const url = new URL(request.url);
+  const pathname = url.pathname;
+  console.log(pathname);
+
+  // sessions
+  const userAuthSession = await getUserSession(request.headers.get("Cookie"));
+  const flashSession = await getFlashSession(request.headers.get("Cookie"));
+
+  // get form data values
+  const formData = await request.formData();
+  const formValues = Object.fromEntries(formData.entries());
+
+  // make post request
+  try {
+    let response;
+    if (formValues.intent === "register") {
+      response = await axios.post(
+        `${process.env.BACKEND_API_BASE_URL}/${formValues.role}/register`,
+        formValues
+      );
+    } else {
+      response = await axios.post(
+        `${process.env.BACKEND_API_BASE_URL}/${formValues.role}/login`,
+        {
+          email: formValues.email,
+          password: formValues.password,
+        }
+      );
+    }
+
+    if (response.data.code === 200 && formValues.role === "users") {
+      userAuthSession.set("token", response.data.data.token);
+      userAuthSession.set("authenticatedUser", response.data.data.user);
+    }
+
+    flashSession.set("alert", response.data);
+
+    const headers = new Headers();
+    headers.append("Set-Cookie", await commitFlashSession(flashSession));
+    headers.append("Set-Cookie", await commitUserSession(userAuthSession));
+
+    return redirect(pathname, {
+      headers,
+    });
+  } catch (error: any) {
+    console.error(error);
+    flashSession.set("alert", {
+      code: 401,
+      status: "error",
+      message: "An unexpected error occurred!. " + error.message,
+    });
+    return json(null, {
+      headers: {
+        "Set-Cookie": await commitFlashSession(flashSession),
+      },
+    });
+  }
+
+  return null;
+};
+
 export const loader: LoaderFunction = async ({ request }) => {
   // sessions
-  const authSession = await getSession(request.headers.get("Cookie"));
-  const token = authSession.get("token");
+  const userAuthSession = await getUserSession(request.headers.get("Cookie"));
+  const userToken = userAuthSession.get("token");
+  const authUser = userAuthSession.get("authenticatedUser");
 
   return {
-    token,
+    token: userToken,
+    user: authUser,
   };
 };

@@ -4,6 +4,15 @@ export type CategoryInterface = {
   description: string;
 };
 
+export type UserInterface = {
+  _id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  photo: string;
+};
+
 export type PropertyInterface = {
   _id?: string;
   title: string;
